@@ -3,12 +3,31 @@
  */
 package org.co;
 
-public class App {
+import java.awt.Color;
+import java.awt.Dimension;
+
+import javax.swing.JFrame;
+
+import org.co.panel.order_panel;
+
+public class App extends JFrame {
+    public App() {
+        setTitle("Pizza Online Order");
+        setPreferredSize(new Dimension(400, 500));
+        setForeground(Color.black);
+        setSize(getPreferredSize());
+        var p = new order_panel(this); 
+        add(p);
+        setVisible(true);
+        pack();
+    }
+
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        App app = new App();
+        System.out.println(app.getGreeting());
     }
 }
