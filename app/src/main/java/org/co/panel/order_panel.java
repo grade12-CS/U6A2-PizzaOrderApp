@@ -15,7 +15,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,19 +28,19 @@ import org.co.components.dave_textfield;
 public class order_panel extends JPanel {
     private final dave_textfield text_name, text_address; 
     private final JRadioButton rbtn_small, rbtn_medium, rbtn_large;
-    private final JLabel label_size, label_toppings;
+    private final JLabel label_size, label_topping_checkboxes;
     private final JCheckBox cb_cheese, cb_pepperoni, cb_mushrooms, cb_olives;
-    private final JButton btn_place_order;
+    private final JButton btn_place_order, btn_reset;
     private final JTextPane order_pane;
     private final ButtonGroup rbtn_group = new ButtonGroup(); //button group of radio buttons. This ensures only one button is selected.
 
-    private size pizza_size = size.small; //stores pizza size; the cost for toppings differ based on size
-    private final HashSet<topping> orders = new HashSet<>(); //stores toppings selected
+    private size pizza_size = size.small; //default pizza size is small
+    private final HashSet<topping> orders = new HashSet<>(); //stores topping_checkboxes selected
     private final JFrame root; //access to the main root Jframe. it is mainly for getting sizes. (getRootPane or getParent returns null for unknown reason)
     private double subtotal = 0.0; //a variable to store subtotal. This will be used for calculating total cost
     private final double tax_rate = 0.1316; //Canada max tax rate lol
     
-    private ItemListener size_listener, toppings_listener;
+    private ItemListener size_listener, topping_checkboxes_listener;
     private final HashMap<JCheckBox, topping> cb_map = new HashMap<>(); //use a hashmap to efficiently handle state changes for all topping checkboxes
 
     public enum size {
@@ -72,18 +71,19 @@ public class order_panel extends JPanel {
         setSize(getSize());
         setLayout(new BoxLayout(this , BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(0, 20, 30, 20)); 
-        text_name = new dave_textfield("Name: ", 20); //TODO: how to make textfield stretch out as much as it can?
-        text_address = new dave_textfield("Address: ", 20);
+        text_name = new dave_textfield("Name: ", 25); //TODO: how to make textfield stretch out as much as it can?
+        text_address = new dave_textfield("Address: ", 24);
         label_size = new JLabel("Size: ");
         rbtn_small = new JRadioButton("Small ($8)");
         rbtn_medium = new JRadioButton("Medium ($10)");
         rbtn_large = new JRadioButton("Large ($12)");
-        label_toppings = new JLabel("Toppings($1-sm, $1.5-md, $2-lg)");
+        label_topping_checkboxes = new JLabel("Topping_checkboxes($1-sm, $1.5-md, $2-lg)");
         cb_cheese = new JCheckBox("Cheese");
         cb_pepperoni = new JCheckBox("Pepperoni");
         cb_mushrooms = new JCheckBox("Mushrooms");
         cb_olives = new JCheckBox("Olives");
         btn_place_order = new JButton("Place Order");
+        btn_reset = new JButton("Reset");
         order_pane = new JTextPane();
         cb_map.put(cb_cheese, topping.chesse);
         cb_map.put(cb_mushrooms, topping.mushroom);
@@ -101,21 +101,22 @@ public class order_panel extends JPanel {
         add(size_rbtns());
         add(Box.createVerticalStrut(10));
         
-        add(toppings());
+        add(topping_checkboxes());
         add(Box.createVerticalStrut(10));
         
-        btn_place_order.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        add(btn_place_order);
+        add(order_and_reset_btns());
         add(Box.createVerticalStrut(10));
         
         add(orders_list());
     }
 
     private void init_listeners() {
-        //a trational way to add action listener: add listener to each button manually and use if statement to discern type of a source.
+        //add actions to order and reset buttons
         btn_place_order.addActionListener((ActionEvent e) -> {
             order_pane.setText(get_results());
         });
+        btn_reset.addActionListener((ActionEvent e) -> reset());
+        //a trational way to add action listener: add listener to each button manually and use if statement to discern type of a source.
         size_listener = (ItemEvent e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 var source = e.getSource();
@@ -133,7 +134,7 @@ public class order_panel extends JPanel {
         rbtn_large.addItemListener(size_listener);
 
         //another (more efficient) way to add action listeners: create a hashmap for buttons and iterate through the map
-        toppings_listener = (ItemEvent e) -> {
+        topping_checkboxes_listener = (ItemEvent e) -> {
             var s = (JCheckBox) e.getSource(); 
             var topping = cb_map.get(s);
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -145,32 +146,46 @@ public class order_panel extends JPanel {
             }
         };
         for (var entry : cb_map.entrySet()) {
-            entry.getKey().addItemListener(toppings_listener);
+            entry.getKey().addItemListener(topping_checkboxes_listener);
+        }
+    }
+
+    public void reset() {
+        subtotal = 0;
+        pizza_size = size.small;
+        orders.clear();
+        order_pane.setText("");
+        text_name.set_text("");
+        text_address.set_text("");
+        rbtn_group.setSelected(rbtn_small.getModel(), true);
+        //unselects topping checkboxes
+        for (var cb : cb_map.keySet()) {
+            cb.setSelected(false); 
         }
     }
 
     private String get_results() {
         String st = "Order Summary: \nName: " + text_name.get_text() + "\nAddress: " + text_address.get_text();
         st += "\nPizza Size: " + pizza_size.name();
-        st += "\nToppings: ";
+        st += "\nTopping_checkboxes: ";
         for (topping t :  orders) {
             st += t.name() + ' ';
         }
-        st += "\nSub Total: $" + subtotal + pizza_size.size_price; //calculates subtotal sum of pizza size and toppings
+        st += "\nSub Total: $" + subtotal + pizza_size.size_price; //calculates subtotal sum of pizza size and topping_checkboxes
         double tax = subtotal * tax_rate;
         st += "\nTax: $" + tax; 
         st += "\nTotal: $" + tax + subtotal;
         return st;
     }
 
-    private JPanel toppings() {
+    private JPanel topping_checkboxes() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         var c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
-        panel.add(label_toppings, c);
+        panel.add(label_topping_checkboxes, c);
         c.ipadx = 0;
         c.gridwidth = 1;
         c.gridx = 2;
@@ -198,6 +213,13 @@ public class order_panel extends JPanel {
         rbtn_group.add(rbtn_large);
         rbtn_group.setSelected(rbtn_small.getModel(), true);
 
+        return panel;
+    }
+
+    private JPanel order_and_reset_btns() {
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(btn_place_order);
+        panel.add(btn_reset);
         return panel;
     }
 

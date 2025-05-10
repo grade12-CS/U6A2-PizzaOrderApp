@@ -46,4 +46,12 @@ public class dave_textfield extends JPanel {
     public String get_text() {
         return text.getText();
     }
+    
+    public void set_text(String value) {
+        text.setText(value);
+    }
+
+    public void set_label(String value) {
+        label.setText(value);
+    }
 }
