@@ -201,6 +201,7 @@ public class order_panel extends JPanel {
         double tax = subtotal * tax_rate;
         st += "\nTax: $" + tax; 
         st += "\nTotal: $" + tax + subtotal;
+        st += "\n\nThank you for your order!";
         return st;
     }
 
