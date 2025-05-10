@@ -25,6 +25,9 @@ import javax.swing.border.EmptyBorder;
 
 import org.co.components.dave_textfield;
 
+/**
+ * a Jpanel that constructs pizza order GUI 
+ */
 public class order_panel extends JPanel {
     private final dave_textfield text_name, text_address; 
     private final JRadioButton rbtn_small, rbtn_medium, rbtn_large;
@@ -43,6 +46,9 @@ public class order_panel extends JPanel {
     private ItemListener size_listener, topping_checkboxes_listener;
     private final HashMap<JCheckBox, topping> cb_map = new HashMap<>(); //use a hashmap to efficiently handle state changes for all topping checkboxes
 
+    /**
+     * enum that categorizes pizza sizes. it stores size of pizza price and a topping price.
+     */
     public enum size {
         small(8.0, 1.0),
         medium(10.0, 1.5),
@@ -55,17 +61,24 @@ public class order_panel extends JPanel {
         }
     } 
 
+    /**
+     * enum type of toppings
+     */
     public enum topping {
-        chesse("cheese"),
-        mushroom("mushroom"),
-        olive("olive"),
-        pepperoni("pepperoni");
+        chesse("Cheese"),
+        mushroom("Mushroom"),
+        olive("Olive"),
+        pepperoni("Pepperoni");
         public final String value;
         private topping(String value) {
            this.value = value; 
         }
     }
 
+    /**
+     * constructor of order_panel. All JComponents, action listeners, layouts, and necessary data structures are initialized.
+     * @param root
+     */
     public order_panel(JFrame root) {
         this.root = root;
         setSize(getSize());
@@ -93,6 +106,9 @@ public class order_panel extends JPanel {
         init_listeners();
     }
     
+    /**
+     * adds custom panels and Jcomponents
+     */
     private void add_components() {
         add(text_name);
         add(text_address);
@@ -110,6 +126,9 @@ public class order_panel extends JPanel {
         add(orders_list());
     }
 
+    /**
+     * initializes action and item listeners and add them to Jcomponents
+     */
     private void init_listeners() {
         //add actions to order and reset buttons
         btn_place_order.addActionListener((ActionEvent e) -> {
@@ -150,6 +169,9 @@ public class order_panel extends JPanel {
         }
     }
 
+    /**
+     * resets instance variables, text fields, and selections
+     */
     public void reset() {
         subtotal = 0;
         pizza_size = size.small;
@@ -164,6 +186,10 @@ public class order_panel extends JPanel {
         }
     }
 
+    /**
+     * creates a reciept of orders, incluing all informations provided by user
+     * @return summary of orders and user informations
+     */
     private String get_results() {
         String st = "Order Summary: \nName: " + text_name.get_text() + "\nAddress: " + text_address.get_text();
         st += "\nPizza Size: " + pizza_size.name();
@@ -178,6 +204,10 @@ public class order_panel extends JPanel {
         return st;
     }
 
+    /**
+     * creates a Jpanel to layout topping checkboxes 
+     * @return topping checkboxes panel
+     */
     private JPanel topping_checkboxes() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -200,6 +230,10 @@ public class order_panel extends JPanel {
         return panel;
     }
 
+    /**
+     * creates a Jpanel to layout pizza size radio buttons
+     * @return pizza size radio buttons panel
+     */
     private JPanel size_rbtns() {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
@@ -216,6 +250,10 @@ public class order_panel extends JPanel {
         return panel;
     }
 
+    /**
+     * creates a Jpanel to layout place_order and reset buttons
+     * @return place_order and reset buttons panel
+     */
     private JPanel order_and_reset_btns() {
         JPanel panel = new JPanel(new FlowLayout());
         panel.add(btn_place_order);
@@ -223,6 +261,10 @@ public class order_panel extends JPanel {
         return panel;
     }
 
+    /**
+     * creatrs a scrollable pane that allows orders list to expand when necessary
+     * @return scrollable pane of orders list or reciept
+     */
     private JScrollPane orders_list() {
         JScrollPane pane = new JScrollPane(order_pane);
         pane.setPreferredSize(new Dimension(root.getWidth(), 600));
