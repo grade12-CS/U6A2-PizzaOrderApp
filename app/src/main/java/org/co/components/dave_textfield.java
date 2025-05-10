@@ -42,4 +42,8 @@ public class dave_textfield extends JPanel {
         add(label);
         add(text);
     }
+
+    public String get_text() {
+        return text.getText();
+    }
 }
