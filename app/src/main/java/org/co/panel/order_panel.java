@@ -146,6 +146,7 @@ public class order_panel extends JPanel {
                 } else if (source == rbtn_large) {
                     pizza_size = size.large;
                 }
+                update_subtotal();
             }
         };
         rbtn_small.addItemListener(size_listener);
@@ -167,6 +168,17 @@ public class order_panel extends JPanel {
         };
         for (var entry : cb_map.entrySet()) {
             entry.getKey().addItemListener(topping_checkboxes_listener);
+        }
+    }
+
+    /**
+    * updatrs subtotal on pizza size change
+    */
+    private void update_subtotal() {
+        subtotal = 0;
+        subtotal += pizza_size.size_price;
+        for (int i = 0; i < orders.size(); ++i) {
+            subtotal += pizza_size.topping_price;
         }
     }
 
