@@ -104,8 +104,10 @@ public class order_panel extends JPanel {
         cb_map.put(cb_olives, topping.olive);
         add_components();
         init_listeners();
+        subtotal = pizza_size.size_price;
     }
     
+
     /**
      * adds custom panels and Jcomponents
      */
