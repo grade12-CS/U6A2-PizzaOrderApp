@@ -162,6 +162,7 @@ public class order_panel extends JPanel {
                 orders.add(topping);
             } else {
                 orders.remove(topping);
+                subtotal -= pizza_size.topping_price;
             }
         };
         for (var entry : cb_map.entrySet()) {
@@ -200,7 +201,7 @@ public class order_panel extends JPanel {
         st += "\nSub Total: $" + subtotal + pizza_size.size_price; //calculates subtotal sum of pizza size and topping_checkboxes
         double tax = subtotal * tax_rate;
         st += "\nTax: $" + tax; 
-        st += "\nTotal: $" + tax + subtotal;
+        st += "\nTotal: $" + (tax + subtotal);
         st += "\n\nThank you for your order!";
         return st;
     }
